@@ -1,0 +1,17 @@
+Connections (MSP430FR5969 <-> STM32F407G)
+P1.3 <-> BOOT0      
+P1.4 <-> PB2           
+P1.5 <-> NRST
+P2.5 <-> PB11
+P2.6 <-> PB10
+
+MSP430FR5969 to FRAM Connections
+P1.6 <-> SDI 
+P1.7 <-> SDO
+P2.2 <-> CLK
+P1.2 <-> CS
+
+Anotaciones acerca de la depuración
+- La configuración de SPI es correcta.
+SPI esta configurado en modo 0.
+- 
