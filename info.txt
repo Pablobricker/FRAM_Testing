@@ -11,6 +11,10 @@ P1.7 <-> SDO
 P2.2 <-> CLK
 P1.2 <-> CS
 
+Delicados con el alambrado
+No funciona en el proyecto genera
+hacer pruebas en un proyecto independiente xd
+
 Anotaciones acerca de la depuración
 - La configuración de SPI es correcta.
 SPI esta configurado en modo 0.

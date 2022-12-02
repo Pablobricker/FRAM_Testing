@@ -15,8 +15,7 @@
 //MSP SPI-SS P1.3 <-> 53 o
 // Prueba funciona bien
 
-int FRAM_dataW[]={0x10,0x20,0x30,0x40};
-uint32_t FRAM_dataR[4];
+
 
 void divisor_byte(){
     eUSCIB0_CS1_set_state(1);
@@ -24,7 +23,56 @@ void divisor_byte(){
     eUSCIB0_CS1_set_state(0);
 }
 
-void FRAM_write(int ADDRESS_1,int ADDRESS_2,int ADDRESS_3,int Nbytes){
+//Recibe como 4to parametro (apuntador) el nombre del arreglo que se va a cargar
+//Esto es la direccion del primer elemento
+//A[]={0,1,2,3,4}
+//A=&A[0]
+void FRAM_write(int ADDRESS_1,int ADDRESS_2,int ADDRESS_3,int* arrayTx, int arrayTxSize){
+    unsigned int i;
+    eUSCIB0_CS1_set_state(0); //CS LOW
+    eUSCIB0_SPI_writeByte(WREN);
+    eUSCIB0_CS1_set_state(1);
+    _delay_cycles(10);
+    //Va un ciclo de CS aquí
+    //divisor_byte();
+    eUSCIB0_CS1_set_state(0);
+    eUSCIB0_SPI_writeByte(WRITE);
+    //divisor_byte();
+    eUSCIB0_SPI_writeByte(ADDRESS_1);
+    //divisor_byte();
+    eUSCIB0_SPI_writeByte(ADDRESS_2);
+    //divisor_byte();
+    eUSCIB0_SPI_writeByte(ADDRESS_3);
+    //divisor_byte();
+    for(i=0;i<=arrayTxSize;i++){
+        eUSCIB0_SPI_writeByte(*(arrayTx+i));
+//        eUSCIB0_SPI_writeByte(*(arrayTx));  //*(array+i)
+//        arrayTx++;
+        //divisor_byte();
+    }
+    eUSCIB0_CS1_set_state(1);
+}
+
+void FRAM_read(int ADDRESS_1,int ADDRESS_2,int ADDRESS_3,uint16_t* arrayRx, int arrayRxSize){
+    unsigned int i;
+    eUSCIB0_CS1_set_state(0);
+    eUSCIB0_SPI_writeByte(READ);
+    //divisor_byte();
+    eUSCIB0_SPI_writeByte(ADDRESS_1);
+    //divisor_byte();
+    eUSCIB0_SPI_writeByte(ADDRESS_2);
+    //divisor_byte();
+    eUSCIB0_SPI_writeByte(ADDRESS_3);
+    for(i=0;i<=arrayRxSize-1;i++){
+        eUSCIB0_SPI_writeByte(0xFF); //Sigue escribiendo para mantener el reloj en funcionamiento
+          *(arrayRx+i) = eUSCIB0_SPI_readByte();
+//        *(arrayRx) = eUSCIB0_SPI_readByte();      //*(array+i)
+//        arrayRx++;
+    }
+    eUSCIB0_CS1_set_state(1);
+}
+
+void FRAM_erase(int ADDRESS_1,int ADDRESS_2,int ADDRESS_3,int Nbytes){
     unsigned int i;
     eUSCIB0_CS1_set_state(0); //CS LOW
     eUSCIB0_SPI_writeByte(WREN);
@@ -42,25 +90,8 @@ void FRAM_write(int ADDRESS_1,int ADDRESS_2,int ADDRESS_3,int Nbytes){
     eUSCIB0_SPI_writeByte(ADDRESS_3);
     //divisor_byte();
     for(i=0;i<=Nbytes;i++){
-        eUSCIB0_SPI_writeByte(FRAM_dataW[i]);
+        eUSCIB0_SPI_writeByte(0x00);
         //divisor_byte();
-    }
-    eUSCIB0_CS1_set_state(1);
-}
-
-void FRAM_read(int ADDRESS_1,int ADDRESS_2,int ADDRESS_3,int Nbytes){
-    unsigned int i;
-    eUSCIB0_CS1_set_state(0);
-    eUSCIB0_SPI_writeByte(READ);
-    //divisor_byte();
-    eUSCIB0_SPI_writeByte(ADDRESS_1);
-    //divisor_byte();
-    eUSCIB0_SPI_writeByte(ADDRESS_2);
-    //divisor_byte();
-    eUSCIB0_SPI_writeByte(ADDRESS_3);
-    for(i=0;i<=Nbytes-1;i++){
-        eUSCIB0_SPI_writeByte(0xFF); //Sigue escribiendo para mantener el reloj en funcionamiento
-        FRAM_dataR[i] = eUSCIB0_SPI_readByte();
     }
     eUSCIB0_CS1_set_state(1);
 }
